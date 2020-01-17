@@ -1,0 +1,88 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+
+            <form class="form-group">
+                <select id="author" class="form-control">
+                    <option selected="true" disabled="disabled">Choose Author</option>
+                </select><br />
+                <select id="book" class="form-control">
+                    <option selected="true" disabled="disabled">Choose Book</option>
+                </select> <br />
+                <select id="lang" class="form-control">
+                    <option selected="true" disabled="disabled">Choose Language</option>
+                </select>
+
+
+
+            </form>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+
+    <script>
+        $(document).ready(() => {
+            $.ajax({
+                type: "GET",
+                url: "/Home/GetAllAuthors",
+                success: function (response) {
+                    for (let f of response) {
+                        $("#author").append(`<option value=${f.id}>${f.name}</option>`)
+
+                    }
+
+                }
+
+
+            })
+            $("#author").change(function () {
+                let selectedId = $(this).val();
+                $("#book").empty();
+                $("#lang").empty();
+                $.ajax({
+                    url: "/Home/GetBooksByAuthor",
+                    type: "POST",
+                    data: { id: selectedId },
+                    success: (response) => {
+                        $("#lang").append(`<option selected="true" disabled="disabled">Choose Language</option>`);
+                        $("#book").append(`<option selected="true" disabled="disabled">Choose Book</option>`);
+                        for (let t of response) {
+                            $("#book").append(`<option value=${t.id} >${t.name}</option>`)
+                        }
+                    }
+
+                })
+
+            })
+            $("#book").change(function () {
+                let selecteBookId = $(this).val();
+                $("#lang").empty();
+                $.ajax({
+                    type: "POST",
+                    url: "/Home/GetLangByBookId",
+                    data: { id: selecteBookId },
+                    success: (data) => {
+                        $("#lang").append(`<option selected="true" disabled="disabled">Choose Language</option>`);
+                        for (let j of data) {
+                            $("#lang").append(`<option>${j.name}</option>`);
+
+                        }
+
+                    }
+
+                })
+
+            })
+        })
+
+
+
+    </script>
+
+}
